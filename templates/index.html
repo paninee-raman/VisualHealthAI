@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Health AI - SkinSense AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="text-gray-200 min-h-screen flex flex-col justify-between relative overflow-hidden bg-[#06060e]">
+
+    <div class="absolute inset-0 glow-bg pointer-events-none"></div>
+
+    <header class="w-full max-w-7xl mx-auto px-6 py-4 flex justify-between items-center border-b border-gray-800/40 relative z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <i class="fa-solid fa-square-h text-xl text-white"></i>
+            </div>
+            <div>
+                <span class="text-sm font-semibold tracking-wide block text-white">Visual Health AI</span>
+                <span class="text-xs text-gray-500 block -mt-1">localhost:5173</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-xs font-medium text-emerald-400">Backend Online</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center justify-center px-4 text-center max-w-3xl mx-auto relative z-10 my-12">
+        <div class="w-16 h-16 rounded-2xl bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center mb-6 shadow-xl">
+            <i class="fa-solid fa-stethoscope text-2xl text-indigo-400"></i>
+        </div>
+        <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl mb-3">SkinSense AI</h1>
+        <p class="text-lg text-indigo-300/80 font-medium mb-4">Advanced Cancer Detection</p>
+        <p class="text-gray-400 max-w-xl leading-relaxed mb-8">
+            Upload a clear, well-lit photo of the skin lesion for AI analysis. Supports JPEG, PNG, and WebP formats.
+        </p>
+        <button id="openModalBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-6 py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-2">
+            Upload & Analyse <i class="fa-solid fa-arrow-right text-sm"></i>
+        </button>
+    </main>
+
+    <footer class="w-full max-w-4xl mx-auto px-6 py-6 border-t border-gray-900/60 text-center relative z-10">
+        <p class="text-xs text-gray-500 leading-relaxed max-w-3xl mx-auto">
+            <span class="font-semibold text-gray-400">Disclaimer:</span> This tool is for educational and screening purposes only. It is not 100% accurate and does not replace professional medical advice. Please consult a qualified doctor or dermatologist for formal diagnosis and clinical consultation.
+        </p>
+    </footer>
+
+    <div id="modalOverlay" class="fixed inset-0 modal-blur z-50 hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
+        <div class="w-full max-w-xl bg-[#0d0e1a] border border-gray-800/80 rounded-2xl shadow-2xl overflow-hidden relative">
+            
+            <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-300 transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div id="uploadScreen" class="p-6">
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="p-2.5 bg-indigo-600/10 rounded-xl border border-indigo-500/20 text-indigo-400">
+                        <i class="fa-solid fa-stethoscope text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white">Skin Scan</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Upload a clear, well-lit photo of the skin lesion for AI analysis.</p>
+                    </div>
+                </div>
+
+                <div id="dropzone" class="border-2 border-dashed border-gray-800 hover:border-indigo-500/50 rounded-xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all bg-black/30 min-h-[220px]">
+                    <input type="file" id="fileInput" accept="image/*" class="hidden">
+                    
+                    <div id="dropzoneEmpty" class="contents">
+                        <div class="w-12 h-12 rounded-xl bg-gray-900/50 flex items-center justify-center text-gray-400 border border-gray-800">
+                            <i class="fa-regular fa-image text-xl"></i>
+                        </div>
+                        <p class="text-sm text-gray-400">
+                            Drop image here or <span class="text-indigo-400 hover:underline font-medium">browse</span>
+                        </p>
+                        <p class="text-xs text-gray-600">JPEG, PNG, WebP supported</p>
+                    </div>
+
+                    <div id="dropzonePreview" class="hidden w-full flex flex-col items-center justify-center gap-3">
+                        <img id="imagePreview" src="" alt="Lesion Preview" class="max-h-40 rounded-lg border border-gray-800 object-cover shadow-md">
+                        <p id="fileNameTxt" class="text-xs text-gray-500 hover:text-indigo-400 transition-colors"></p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 mt-6">
+                    <button id="cancelBtn" class="flex-1 py-3 px-4 rounded-xl border border-gray-800 text-sm font-medium text-gray-400 hover:bg-gray-900 hover:text-white transition-all">
+                        Cancel
+                    </button>
+                    <button id="runAnalysisBtn" disabled class="flex-1 py-3 px-4 rounded-xl text-sm font-medium text-gray-500 bg-gray-900 border border-gray-800/50 cursor-not-allowed transition-all flex items-center justify-center gap-2">
+                        <span id="btnText">Run Analysis</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="resultScreen" class="p-6 hidden">
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="p-2.5 bg-indigo-600/10 rounded-xl border border-indigo-500/20 text-indigo-400">
+                        <i class="fa-solid fa-stethoscope text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white">Skin Scan Result</h3>
+                    </div>
+                </div>
+
+                <div class="bg-[#160c10] border border-red-950/40 rounded-xl p-4 mb-4 flex flex-col gap-1">
+                    <span class="text-xs font-semibold tracking-wider text-gray-500 uppercase">Detected Condition</span>
+                    <span id="resultCondition" class="text-xl font-bold text-red-500 tracking-wide">---</span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 mb-4">
+                    <div class="bg-[#111222] border border-gray-800/60 rounded-xl p-3 flex flex-col">
+                        <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Confidence</span>
+                        <span id="resultConfidence" class="text-lg font-bold text-white mt-1">--%</span>
+                    </div>
+                    <div class="bg-[#111222] border border-gray-800/60 rounded-xl p-3 flex flex-col">
+                        <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Scan Type</span>
+                        <span class="text-sm font-semibold text-gray-300 mt-1.5">Skin</span>
+                    </div>
+                    <div class="bg-[#111222] border border-gray-800/60 rounded-xl p-3 flex flex-col">
+                        <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Mode</span>
+                        <span class="text-sm font-semibold text-indigo-400 mt-1.5">Model</span>
+                    </div>
+                </div>
+
+                <div class="bg-emerald-950/20 border border-emerald-900/30 rounded-xl p-3.5 flex items-center gap-3 mb-6 text-emerald-400">
+                    <i class="fa-solid fa-square-check text-base"></i>
+                    <p class="text-xs font-medium">
+                        Saved to database - ID: <span id="resultId" class="font-mono text-emerald-300 bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-800/40">------</span>
+                    </p>
+                </div>
+
+                <div class="bg-gray-900/30 border border-gray-800/40 rounded-xl p-3 flex gap-3 items-start mb-6 text-gray-400">
+                    <i class="fa-solid fa-circle-info text-xs mt-0.5 text-gray-500"></i>
+                    <p class="text-[11px] leading-normal">
+                        This is an AI-assisted screening tool and does not replace professional medical advice. Please consult a qualified healthcare provider.
+                    </p>
+                </div>
+
+                <button id="doneBtn" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-lg shadow-emerald-600/10 transition-all">
+                    Done
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #06060e;
+}
+
+/* Deep background ambient radial glowing light */
+.glow-bg {
+    background: radial-gradient(circle at 50% 45%, rgba(79, 70, 229, 0.14) 0%, rgba(0,0,0,0) 65%);
+}
+
+/* Backdrop micro blur styling behind active window card elements */
+.modal-blur {
+    backdrop-filter: blur(10px);
+    background-color: rgba(4, 4, 10, 0.88);
+}
+
+/* Interface Transition Rates */
+#modalOverlay {
+    transition: opacity 0.2s ease-in-out;
+}
