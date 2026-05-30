@@ -178,6 +178,6 @@ def prep_data_and_train(dataset_dir='dataset', epochs=5, batch_size=32):
 if __name__ == '__main__':
 
     prep_data_and_train(
-        epochs=5,
+        epochs=20,
         batch_size=32
     )
