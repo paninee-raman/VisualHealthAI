@@ -3,7 +3,7 @@ import numpy as np
 import secrets
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
-from PIL import Image
+from PIL import Image, ImageFilter
 
 # Suppress TensorFlow startup logs for a cleaner terminal
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -45,9 +45,16 @@ def analyze():
         # 2. Image Preprocessing
         # Open the image file directly from the stream into Pillow
         img = Image.open(file.stream).convert('RGB')
-        
-        # Resize image to match your model's input dimension shapes (typically 224x224 or 128x128)
-        img = img.resize((224, 224)) 
+        # Deblur / sharpen image
+        img = img.filter(
+            ImageFilter.UnsharpMask(
+                radius=1.5,
+                percent=120,
+                threshold=3
+                )
+            )
+        # Resize image to match your model's input dimension shapes
+        img = img.resize((224, 224))
         
         # Convert image bytes to a normalized NumPy matrix float array [0, 1]
         img_array = np.array(img) / 255.0
