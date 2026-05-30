@@ -1,2 +1,2 @@
 # VisualHealthAI
-AI powered skin cancer detection web app built with TensorFlow, MobileNetV2, Flask, and computer vision.
+Intelligent skin lesion analysis platform leveraging deep learning and computer vision for automated skin cancer classification. Built with TensorFlow, Flask, HTML, CSS, and JavaScript to provide an interactive and user-friendly diagnostic support experience.
