@@ -90,6 +90,8 @@ def analyze():
         print(f"Error handling image inference computation: {str(e)}")
         return jsonify({'error': f'Inference engine pipeline error: {str(e)}'}), 500
 
-if __name__ == '__main__':
-    # Start the server on localhost port 5000
-    app.run(host='127.0.0.1', port=5000, debug=True)
+if __name__ == "__main__":
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000))
+    )
