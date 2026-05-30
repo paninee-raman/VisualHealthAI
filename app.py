@@ -69,7 +69,8 @@ def analyze():
         # 0 = Benign, 1 = Malignant/Cancerous
         raw_score = float(predictions[0][0])
         
-        if raw_score >= 0.5:
+        THRESHOLD = 0.7
+        if raw_score >= THRESHOLD:
             condition = "Benign"
             confidence = round(raw_score * 100)
         else:
