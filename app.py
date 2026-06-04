@@ -3,7 +3,7 @@ import numpy as np
 import secrets
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageStat
 
 # Suppress TensorFlow startup logs for a cleaner terminal
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -55,26 +55,39 @@ def analyze():
             )
         # Resize image to match your model's input dimension shapes
         img = img.resize((224, 224))
-        
-        # Convert image bytes to a normalized NumPy matrix float array [0, 1]
+        # Check image brightness
+        stat = ImageStat.Stat(img)
+        brightness = sum(stat.mean) / len(stat.mean)
+        if brightness < 20:
+            return jsonify({
+                "status": "error",
+                "condition": "Invalid Image",
+                "message": "Image is too dark for analysis."
+                }), 400
+
+        # Convert image bytes to a normalized NumPy matrix float array
         img_array = np.array(img) / 255.0
-        
-        # Expand dimensions to fit batch processing format: (1, 224, 224, 3)
+
+        # Expand dimensions
         img_array = np.expand_dims(img_array, axis=0)
-        
-        # 3. Compile Model Inference
+
+        # Run prediction
         predictions = model.predict(img_array)
         
         # Assuming a binary classification model out-parameter (e.g., Sigmoid output between 0 and 1)
         # 0 = Benign, 1 = Malignant/Cancerous
         raw_score = float(predictions[0][0])
         
-        THRESHOLD = 0.7
-        if raw_score >= THRESHOLD:
-            condition = "Benign"
-            confidence = round(raw_score * 100)
-        else:
+        if 0.4 <= raw_score < 0.7:
+            condition = "Uncertain"
+            confidence = 0
+
+        elif raw_score >= 0.7:
             condition = "Cancerous"
+            confidence = round(raw_score * 100)
+
+        else:
+            condition = "Benign"
             confidence = round((1 - raw_score) * 100)
         # 4. Return Data Payload matching your interface fields
         mock_id = f"F8260B6{secrets.token_hex(3).upper()}"
