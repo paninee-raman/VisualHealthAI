@@ -77,18 +77,15 @@ def analyze():
         # Assuming a binary classification model out-parameter (e.g., Sigmoid output between 0 and 1)
         # 0 = Benign, 1 = Malignant/Cancerous
         raw_score = float(predictions[0][0])
-        
-        if 0.4 <= raw_score < 0.7:
-            condition = "Uncertain"
-            confidence = 0
 
-        elif raw_score >= 0.7:
+        THRESHOLD = 0.5
+        if raw_score >= THRESHOLD:
             condition = "Cancerous"
             confidence = round(raw_score * 100)
-
         else:
             condition = "Benign"
             confidence = round((1 - raw_score) * 100)
+
         # 4. Return Data Payload matching your interface fields
         mock_id = f"F8260B6{secrets.token_hex(3).upper()}"
         
